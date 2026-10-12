@@ -1,0 +1,324 @@
+2.A University wants to manage student records effectively. Each student record contains USN, Name, Semester (1-8), and Department. Choose suitable data structure (Singly Linked List/ Doubly Linked List/Circular Linked Lists) and develop a menu-driven C program to manage these records with the following operations:
+a. Create a list of student records (choose any insertion method: beginning /end).
+b. View all student records.
+c. Display student records for a given semester.
+d. Insert the new student in the list after the given student’s name.
+e. Delete a student record (based on USN or Name).
+        Note: For CIE Test and SEE, any ONE option from (c) to (e) may be asked along with options (a) & (b).
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+
+// NODE for Singly Linked List
+struct node
+{
+    char usn[20];
+    char name[30];
+    int sem;
+    char dept[20];
+
+    struct node *link;
+};
+
+typedef struct node *NODE;
+
+NODE temp, FIRST = NULL;
+
+
+// Function to create a node
+NODE getnode()
+{
+    NODE x;
+
+    x = (NODE)malloc(sizeof(struct node));
+
+    x->link = NULL;
+
+    return x;
+}
+
+
+// Function to read student details
+void read()
+{
+    temp = getnode();
+
+    printf("Enter USN: ");
+    scanf("%s", temp->usn);
+
+    printf("Enter Name: ");
+    scanf("%s", temp->name);
+
+    printf("Enter Semester: ");
+    scanf("%d", &temp->sem);
+
+    printf("Enter Department: ");
+    scanf("%s", temp->dept);
+}
+
+
+// a. Create a SLL of N Students using end insertion
+void create_SLL()
+{
+    int n, i;
+    NODE last;
+
+    printf("Enter the number of students: ");
+    scanf("%d", &n);
+
+    for(i = 1; i <= n; i++)
+    {
+        printf("\nEnter the details of student %d\n", i);
+
+        read();
+
+        if(FIRST == NULL)
+        {
+            FIRST = temp;
+        }
+        else
+        {
+            last = FIRST;
+
+            while(last->link != NULL)
+                last = last->link;
+
+            last->link = temp;
+        }
+    }
+}
+
+
+// b. Display all student records and count the nodes
+void display_count()
+{
+    int count = 0;
+
+    temp = FIRST;
+
+    if(FIRST == NULL)
+    {
+        printf("\nStudent list is empty\n");
+        printf("Student count is 0\n");
+    }
+    else
+    {
+        printf("\nStudent Details:\n");
+        printf("\nUSN\t\tNAME\t\tSEM\tDEPARTMENT\n");
+        printf("------------------------------------------------\n");
+
+        while(temp != NULL)
+        {
+            count++;
+
+            printf("%s\t\t%s\t\t%d\t%s\n",
+                   temp->usn,
+                   temp->name,
+                   temp->sem,
+                   temp->dept);
+
+            temp = temp->link;
+        }
+
+        printf("\nStudent count is %d\n", count);
+    }
+}
+
+
+// c. Display student records for a given semester
+void display_semester()
+{
+    int sem;
+    int found = 0;
+
+    if(FIRST == NULL)
+    {
+        printf("\nStudent list is empty\n");
+        return;
+    }
+
+    printf("\nEnter the semester: ");
+    scanf("%d", &sem);
+
+    temp = FIRST;
+
+    printf("\nStudents in Semester %d:\n", sem);
+    printf("\nUSN\t\tNAME\t\tSEM\tDEPARTMENT\n");
+    printf("------------------------------------------------\n");
+
+    while(temp != NULL)
+    {
+        if(temp->sem == sem)
+        {
+            printf("%s\t\t%s\t\t%d\t%s\n",
+                   temp->usn,
+                   temp->name,
+                   temp->sem,
+                   temp->dept);
+
+            found = 1;
+        }
+
+        temp = temp->link;
+    }
+
+    if(found == 0)
+    {
+        printf("\nNo students found in Semester %d\n", sem);
+    }
+}
+
+
+// d. Insert a new student after the given student's name
+void insert_after_name()
+{
+    char search_name[30];
+    NODE newnode;
+
+    if(FIRST == NULL)
+    {
+        printf("\nStudent list is empty\n");
+        return;
+    }
+
+    printf("\nEnter the name after which student should be inserted: ");
+    scanf("%s", search_name);
+
+    temp = FIRST;
+
+    while(temp != NULL)
+    {
+        if(strcmp(temp->name, search_name) == 0)
+        {
+            newnode = getnode();
+  
+            printf("\nEnter the details of new student\n");
+
+            printf("Enter USN: ");
+            scanf("%s", newnode->usn);
+
+            printf("Enter Name: ");
+            scanf("%s", newnode->name);
+
+            printf("Enter Semester: ");
+            scanf("%d", &newnode->sem);
+
+            printf("Enter Department: ");
+            scanf("%s", newnode->dept);
+
+            // Insert new node after temp
+
+            newnode->link = temp->link;
+            temp->link = newnode;
+
+            printf("\nStudent inserted successfully\n");
+
+            return;
+        }
+
+        temp = temp->link;
+    }
+
+    printf("\nStudent with name %s not found\n", search_name);
+}
+
+
+// e. Delete a student record based on USN
+void delete_student()
+{
+    char search_usn[20];
+
+    NODE prev = NULL;
+
+    if(FIRST == NULL)
+    {
+        printf("\nStudent list is empty\n");
+        return;
+    }
+
+    printf("\nEnter USN of student to be deleted: ");
+    scanf("%s", search_usn);
+
+    temp = FIRST;
+
+    while(temp != NULL)
+    {
+        if(strcmp(temp->usn, search_usn) == 0)
+        {
+            // If first node is to be deleted
+            if(temp == FIRST)
+            {
+                FIRST = FIRST->link;
+            }
+            else
+            {
+                prev->link = temp->link;
+            }
+
+            printf("\nDeleted student: %s\n", temp->name);
+
+            free(temp);
+
+            return;
+        }
+
+        prev = temp;
+        temp = temp->link;
+    }
+
+    printf("\nStudent with USN %s not found\n", search_usn);
+}
+
+
+// Main function
+int main()
+{
+    int choice;
+
+    while(1)
+    {
+        printf("\n\n-----------------------------------------");
+        printf("\n       STUDENT RECORD MANAGEMENT");
+        printf("\n-----------------------------------------");
+
+        printf("\n1. Create SLL");
+        printf("\n2. Display Student Records");
+        printf("\n3. Display Students of Given Semester");
+        printf("\n4. Insert Student After Given Name");
+        printf("\n5. Delete Student Based on USN");
+        printf("\n6. Exit");
+
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice)
+        {
+            case 1:
+                create_SLL();
+                break;
+
+            case 2:
+                display_count();
+                break;
+
+            case 3:
+                display_semester();
+                break;
+
+            case 4:
+                insert_after_name();
+                break;
+
+            case 5:
+                delete_student();
+                break;
+
+            case 6:
+                return 0;
+
+            default:
+                printf("\nInvalid choice\n");
+        }
+    }
+}
